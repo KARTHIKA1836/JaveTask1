@@ -14,7 +14,6 @@ import com.wipro.sbs.util.ProductNotFoundException;
 public class SupermarketBillingService {
 	private ArrayList<Product> products;
 	private ArrayList<Bill> bills;
-	private HashMap<String, Integer> stockMap = new HashMap<>();
 	private static int counter = 1000;
 	
 	public SupermarketBillingService(ArrayList<Product> products, ArrayList<Bill> bills) {
@@ -22,36 +21,46 @@ public class SupermarketBillingService {
 		this.products = products;
 		this.bills = bills;
 	}
-	
 	public Product findProduct(String productId) throws ProductNotFoundException{
+		if (productId == null) {
+            throw new ProductNotFoundException("Product id is null");
+        }
 		for(Product p: products) {
 			if(p.getProductId().equals(productId));
 			return p;
 		}
-		throw new ProductNotFoundException();
+		throw new ProductNotFoundException("Product id '" + productId + "' not found");
 	}
-	public void checkStock(String productId, int quantity) throws OutOfStockException{
+	public void checkStock(String productId, int quantity) throws OutOfStockException, ProductNotFoundException{
 
-	    int available = stockMap.get(productId);
-
-	    if (available < quantity) {
-	        throw new OutOfStockException();
-	    }
+		Product p = findProduct(productId);
+        if (quantity <= 0) {
+            throw new OutOfStockException("Requested quantity must be greater than zero");
+        }
+        if (p.getStock() < quantity) {
+            throw new OutOfStockException("Product '" + p.getProductName() + "' has insufficient stock. Available: "
+                    + p.getStock() + ", Requested: " + quantity);
+        }
 	}
-	public Bill generateBill(ArrayList<BillItem> items) throws BillingOperationException {
-		
-
-		 if (items == null || items.isEmpty()) {
-	            throw new BillingOperationException();
+	public Bill generateBill(ArrayList<BillItem> items) throws BillingOperationException, OutOfStockException, ProductNotFoundException {
+		if (items == null || items.isEmpty()) {
+			throw new BillingOperationException();
+	        }
+	       for (BillItem item : items) {
+	            if (item == null) {
+	                throw new BillingOperationException("Bill contains null item");
+	            }
+	            if (item.getQuantity() <= 0) {
+	                throw new BillingOperationException("Quantity must be greater than zero for productId: " + item.getProductId());
+	            }
+	            checkStock(item.getProductId(), item.getQuantity()); // may throw ProductNotFoundException or OutOfStockException
 	        }
 
-	        // Product validation only
+	        // Deduct stock
 	        for (BillItem item : items) {
-	            try {
-	                findProduct(item.getProductId());
-	            } catch (Exception e) {
-	                throw new BillingOperationException();
-	            }
+	            Product p = findProduct(item.getProductId());
+	            int newStock = p.getStock() - item.getQuantity();
+	            p.setStock(newStock);
 	        }
 
 	        double total = calculateTotal(items);
@@ -62,9 +71,7 @@ public class SupermarketBillingService {
 
 	        return bill;
 	    }
-
-
-	private double calculateTotal(ArrayList<BillItem> items) {
+    private double calculateTotal(ArrayList<BillItem> items) {
 		 double sum = 0;
 	        for (BillItem item : items) {
 	            try {
@@ -84,25 +91,26 @@ public class SupermarketBillingService {
                 break;
             }
         }
-        if (billId1 == null) {
-            throw new BillNotFoundException();
+        if (billId == null) {
+            throw new BillNotFoundException("Bill id '" + billId + "' not found");
         }
+
         bills.remove(billId1);
 	}
-	public void printBillDetails(String billId) throws BillNotFoundException{
+	public void printBillDetails(String billId) throws BillNotFoundException, ProductNotFoundException{
 		for (Bill b : bills) {
             if (b.getBillId().equals(billId)) {
                 System.out.println("BILL DETAILS");
                 System.out.println("Bill ID: " + b.getBillId());
                 System.out.println("Items:");
-
+                
                 for (BillItem item : b.getItems()) {
-                    try {
-                        Product p = findProduct(item.getProductId());
-                        System.out.println(p.toString());
-                    } catch (ProductNotFoundException e) {
-                        System.out.println("Product Unavailable");
-                    }
+                    Product p = findProduct(item.getProductId());
+                    double amount = p.getPrice() * item.getQuantity();
+
+                    System.out.println(p.getProductId()+""+p.getProductName()+""+
+                            item.getQuantity()+""+
+                            amount);
                 }
 
                 System.out.println("Total: " + b.getTotalAmount());
