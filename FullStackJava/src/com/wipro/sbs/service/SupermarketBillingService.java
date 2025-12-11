@@ -21,15 +21,17 @@ public class SupermarketBillingService {
 		this.products = products;
 		this.bills = bills;
 	}
-	public Product findProduct(String productId) throws ProductNotFoundException{
-		if (productId == null) {
-            throw new ProductNotFoundException("Product id is null");
-        }
-		for(Product p: products) {
-			if(p.getProductId().equals(productId));
-			return p;
-		}
-		throw new ProductNotFoundException("Product id '" + productId + "' not found");
+	public Product findProduct(String productId) throws ProductNotFoundException {
+	    if (productId == null) {
+	        throw new ProductNotFoundException("Product id is null");
+	    }
+        for(Product p : products) {
+	        if(p.getProductId().equals(productId)) {
+	            return p;
+	        }
+	    }
+
+	    throw new ProductNotFoundException("Product id '" + productId + "' not found");
 	}
 	public void checkStock(String productId, int quantity) throws OutOfStockException, ProductNotFoundException{
 
@@ -43,9 +45,7 @@ public class SupermarketBillingService {
         }
 	}
 	public Bill generateBill(ArrayList<BillItem> items) throws BillingOperationException, OutOfStockException, ProductNotFoundException {
-		if (items == null || items.isEmpty()) {
-			throw new BillingOperationException();
-	        }
+		
 	       for (BillItem item : items) {
 	            if (item == null) {
 	                throw new BillingOperationException("Bill contains null item");
@@ -55,8 +55,6 @@ public class SupermarketBillingService {
 	            }
 	            checkStock(item.getProductId(), item.getQuantity()); // may throw ProductNotFoundException or OutOfStockException
 	        }
-
-	        // Deduct stock
 	        for (BillItem item : items) {
 	            Product p = findProduct(item.getProductId());
 	            int newStock = p.getStock() - item.getQuantity();
@@ -71,6 +69,7 @@ public class SupermarketBillingService {
 
 	        return bill;
 	    }
+
     private double calculateTotal(ArrayList<BillItem> items) {
 		 double sum = 0;
 	        for (BillItem item : items) {
@@ -82,21 +81,23 @@ public class SupermarketBillingService {
 	        }
 	        return sum;
 	}
-	public void cancelBill(String billId) throws BillNotFoundException{
-		Bill billId1 = null;
+    public void cancelBill(String billId) throws BillNotFoundException {
+        Bill found = null;
 
         for (Bill b : bills) {
-            if (b.getBillId().equals(billId1)) {
-                billId1 = b;
+            if (b.getBillId().equals(billId)) {
+                found = b;
                 break;
             }
         }
-        if (billId == null) {
-            throw new BillNotFoundException("Bill id '" + billId + "' not found");
+
+        if (found == null) {
+            throw new BillNotFoundException("Bill with id '" + billId + "' not found");
         }
 
-        bills.remove(billId1);
-	}
+        bills.remove(found);
+    }
+
 	public void printBillDetails(String billId) throws BillNotFoundException, ProductNotFoundException{
 		for (Bill b : bills) {
             if (b.getBillId().equals(billId)) {
@@ -118,7 +119,7 @@ public class SupermarketBillingService {
             }
         }
 
-        throw new BillNotFoundException();
+        throw new BillNotFoundException(billId);
 	}
 	public void displayAllBills() {
 		for (Bill b : bills) {

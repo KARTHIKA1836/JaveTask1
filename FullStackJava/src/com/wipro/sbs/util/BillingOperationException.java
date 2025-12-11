@@ -1,9 +1,7 @@
 package com.wipro.sbs.util;
 
 public class BillingOperationException extends Exception {
-	public BillingOperationException() {
-        super();
-    }
+	
     public BillingOperationException(String message) {
         super(message);
     }
