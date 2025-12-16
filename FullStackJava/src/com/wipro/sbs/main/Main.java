@@ -81,35 +81,35 @@
 
 
 // BillingOperationException
-package com.wipro.sbs.main;
-
-import java.util.ArrayList;
-import com.wipro.sbs.entity.*;
-import com.wipro.sbs.service.SupermarketBillingService;
-import com.wipro.sbs.util.*;
-
-public class Main {
-    public static void main(String[] args) {
-
-        ArrayList<Product> products = new ArrayList<>();
-        products.add(new Product("P001", "Bread", 45.0, 40));
-
-        ArrayList<Bill> bills = new ArrayList<>();
-
-        SupermarketBillingService service = new SupermarketBillingService(products, bills);
-
-        try {
-            ArrayList<BillItem> items = new ArrayList<>();  // empty list
-
-            service.generateBill(items);
-
-        } catch (BillingOperationException e) {
-            System.out.println("Caught Exception: " + e);
-        } catch (Exception ex) {
-            System.out.println("Unexpected Error: " + ex);
-        }
-    }
-}
+//package com.wipro.sbs.main;
+//
+//import java.util.ArrayList;
+//import com.wipro.sbs.entity.*;
+//import com.wipro.sbs.service.SupermarketBillingService;
+//import com.wipro.sbs.util.*;
+//
+//public class Main {
+//    public static void main(String[] args) {
+//
+//        ArrayList<Product> products = new ArrayList<>();
+//        products.add(new Product("P001", "Bread", 45.0, 40));
+//
+//        ArrayList<Bill> bills = new ArrayList<>();
+//
+//        SupermarketBillingService service = new SupermarketBillingService(products, bills);
+//
+//        try {
+//            ArrayList<BillItem> items = new ArrayList<>();  // empty list
+//
+//            service.generateBill(items);
+//
+//        } catch (BillingOperationException e) {
+//            System.out.println("Caught Exception: " + e);
+//        } catch (Exception ex) {
+//            System.out.println("Unexpected Error: " + ex);
+//        }
+//    }
+//}
 
 //  OutOfStockException
 //
@@ -147,35 +147,33 @@ public class Main {
 
 
 //ProductNotFoundException
-//package com.wipro.sbs.main;
-//
-//import java.util.ArrayList;
-//import com.wipro.sbs.entity.*;
-//import com.wipro.sbs.service.SupermarketBillingService;
-//import com.wipro.sbs.util.*;
-//
-//public class Main {
-//    public static void main(String[] args) {
-//
-//        ArrayList<Product> products = new ArrayList<>();
-//        products.add(new Product("P001", "Bread", 45.0, 20));
-//        products.add(new Product("P002", "Milk", 35.0, 30));
-//
-//        ArrayList<Bill> bills = new ArrayList<>();
-//
-//        SupermarketBillingService service = new SupermarketBillingService(products, bills);
-//
-//        try {
-//            ArrayList<BillItem> items = new ArrayList<>();
-//            items.add(new BillItem("P999", 1));  // INVALID ID
-//
-//            service.generateBill(items);
-//
-//        } catch (ProductNotFoundException e) {
-//            System.out.println("Caught Exception: " + e);
-//        } catch (Exception ex) {
-//            System.out.println("Unexpected Error: " + ex);
-//        }
-//    }
-//}
+package com.wipro.sbs.main;
 
+import java.util.ArrayList;
+import com.wipro.sbs.entity.*;
+import com.wipro.sbs.service.SupermarketBillingService;
+import com.wipro.sbs.util.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        ArrayList<Product> products = new ArrayList<>();
+        products.add(new Product("P001", "Bread", 45.0, 20));
+        products.add(new Product("P002", "Milk", 35.0, 30));
+
+        ArrayList<Bill> bills = new ArrayList<>();
+
+        SupermarketBillingService service = new SupermarketBillingService(products, bills);
+
+        try {
+            // FORCE ProductNotFoundException
+            service.findProduct("P999");   // INVALID product ID
+
+        } catch (ProductNotFoundException e) {
+            System.out.println("Caught Exception: " + e);
+        } catch (Exception ex) {
+            System.out.println("Unexpected: " + ex);
+        }
+    }
+}

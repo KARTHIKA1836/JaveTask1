@@ -26,14 +26,17 @@ public class UserInput {
 //	  int e=a+b+c;
 //	  System.out.print(d/e);
 	  
-	  String name =j.nextLine();
-     int score=j.nextInt();
-     j.nextLine();
-      String dept=j.nextLine();
-      System.out.println("Name:"+name);
-   System.out.println("Score:"+score/10);
-      System.out.println("Dept :"+dept);
-      
+//	  String name =j.nextLine();
+//     int score=j.nextInt();
+//     j.nextLine();
+//      String dept=j.nextLine();
+//      System.out.println("Name:"+name);
+//   System.out.println("Score:"+score/10);
+//      System.out.println("Dept :"+dept);
+	  
+	  
+	  int r = j.nextInt();
+	  System.out.println(3.14*r*r);
 	  
 	  
   }

@@ -22,11 +22,13 @@ public class SupermarketBillingService {
 		this.bills = bills;
 	}
 	public Product findProduct(String productId) throws ProductNotFoundException {
+
 	    if (productId == null) {
 	        throw new ProductNotFoundException("Product id is null");
 	    }
-        for(Product p : products) {
-	        if(p.getProductId().equals(productId)) {
+
+	    for (Product p : products) {
+	        if (p.getProductId().equals(productId)) {
 	            return p;
 	        }
 	    }
@@ -45,15 +47,15 @@ public class SupermarketBillingService {
         }
 	}
 	public Bill generateBill(ArrayList<BillItem> items) throws BillingOperationException, OutOfStockException, ProductNotFoundException {
-		
+		 if (items == null || items.isEmpty()) {
+ 		    throw new BillingOperationException("Bill items cannot be null or empty");
+ 		}
 	       for (BillItem item : items) {
-	            if (item == null) {
-	                throw new BillingOperationException("Bill contains null item");
-	            }
+
 	            if (item.getQuantity() <= 0) {
 	                throw new BillingOperationException("Quantity must be greater than zero for productId: " + item.getProductId());
 	            }
-	            checkStock(item.getProductId(), item.getQuantity()); // may throw ProductNotFoundException or OutOfStockException
+	            checkStock(item.getProductId(), item.getQuantity());
 	        }
 	        for (BillItem item : items) {
 	            Product p = findProduct(item.getProductId());
